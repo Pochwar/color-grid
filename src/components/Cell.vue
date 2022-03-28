@@ -3,7 +3,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import {
+  Component,
+  Prop,
+  Vue,
+  Watch,
+} from 'vue-property-decorator';
 
 const FULL_GAUGE_MAX = 256;
 
@@ -44,6 +49,9 @@ export default class Cell extends Vue {
   @Prop()
   private gridRows!: number;
 
+  @Prop()
+  private lifecycle!: number;
+
   private col = this.seedCol;
 
   private row = this.seedRow;
@@ -76,7 +84,7 @@ export default class Cell extends Vue {
 
   private nextCheckPoint = 0;
 
-  private luckRatio = 0.8;
+  private luckRatio = 0.6;
 
   private luckRatioModifier = 0.01;
 
@@ -103,14 +111,21 @@ export default class Cell extends Vue {
     this.$set(this.b, 'mod', Cell.random(15, 50));
   }
 
+  @Watch('lifecycle')
+  private onLifecycleChange() {
+    if (this.isAlive) {
+      this.run();
+    }
+  }
+
   private live(): void {
     this.isAlive = true;
-    const heartBreak = setInterval(() => {
-      this.run();
-      if (!this.isAlive) {
-        clearInterval(heartBreak);
-      }
-    }, 1000);
+    // const heartBreak = setInterval(() => {
+    //   this.run();
+    //   if (!this.isAlive) {
+    //     clearInterval(heartBreak);
+    //   }
+    // }, 1000);
   }
 
   private run(): void {
@@ -134,7 +149,7 @@ export default class Cell extends Vue {
     this.updateG();
     this.updateB();
 
-    // this.move();
+    this.move();
     this.duplicate();
   }
 
@@ -244,7 +259,7 @@ export default class Cell extends Vue {
         this.luckRatioModifier += LUCK_RATIO_MODIFIER;
       } else {
         this.luckRatio = 1;
-        // this.decadence = true;
+        this.decadence = true;
       }
     } else if (decreaseResult > 0) {
       this.luckRatio -= decreaseResult;

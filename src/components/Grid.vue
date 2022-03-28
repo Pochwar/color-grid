@@ -21,6 +21,7 @@
       :seed-b="cell.b"
       :grid-cols="cols"
       :grid-rows="rows"
+      :lifecycle="lifecycle"
       @duplicate="duplicate"
       @die="removeCell"
     />
@@ -60,6 +61,8 @@ export default class Grid extends Vue {
 
   private cells: Array<CellInterface> = [];
 
+  private lifecycle = 0;
+
   get areas(): Array<AreaInterface> {
     const areas: Array<AreaInterface> = [];
     for (let i = 1; i < this.cols; i += 1) {
@@ -82,6 +85,12 @@ export default class Grid extends Vue {
     };
   }
 
+  private mounted() {
+    setInterval(() => {
+      this.lifecycle += 1;
+    }, 1000);
+  }
+
   private areaStyle(col: number, row: number) {
     return {
       'z-index': 40,
@@ -94,7 +103,6 @@ export default class Grid extends Vue {
   }
 
   private seed(col: number, row: number, r = 0, g = 0, b = 0) {
-    console.log(r);
     this.cells.push({
       uuid: uuidv4(),
       col,
