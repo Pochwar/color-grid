@@ -14,6 +14,14 @@ const FULL_GAUGE_MAX = 256;
 
 const LUCK_RATIO_MODIFIER = 0.01;
 
+interface CellStyle {
+  'z-index': number,
+  'background-color': string,
+  width: string,
+  height: string,
+  'grid-area': string,
+}
+
 @Component({})
 export default class Cell extends Vue {
   @Prop()
@@ -94,7 +102,7 @@ export default class Cell extends Vue {
 
   private records: Array<{ luck?: boolean, ratio: number, duration: number, fuel: number}> = [];
 
-  get cellStyle() {
+  get cellStyle(): CellStyle {
     return {
       'z-index': 50,
       'background-color': `rgba(${this.r.amount}, ${this.g.amount}, ${this.b.amount}, ${this.opacity})`,
@@ -154,12 +162,7 @@ export default class Cell extends Vue {
   }
 
   private duplicate() {
-    this.$emit('duplicate', {
-      uuid: this.uuid,
-      r: this.r.amount,
-      g: this.g.amount,
-      b: this.b.amount,
-    });
+    this.$emit('duplicate', this.uuid);
   }
 
   private move() {
