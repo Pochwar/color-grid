@@ -1,31 +1,37 @@
 <template>
-  <div
-    id="grid"
-    :style="gridStyle"
-  >
+  <div>
     <div
-      v-for="area in areas"
-      :key="`area-${area.col}-${area.row}`"
-      :style="areaStyle(area.col, area.row)"
-      @click="seed(area.col, area.row, 255, 255, 255)"
-    />
-    <Cell
-      v-for="cell in cells"
-      :key="`cell-${cell.col}-${cell.row}`"
-      :uuid="cell.uuid"
-      :size="size"
-      :seed-col="cell.col"
-      :seed-row="cell.row"
-      :seed-r="cell.r"
-      :seed-g="cell.g"
-      :seed-b="cell.b"
-      :grid-cols="cols"
-      :grid-rows="rows"
-      :lifecycle="lifecycle"
-      @duplicate="duplicate"
-      @die="removeCell"
-    />
+      id="grid"
+      :style="gridStyle"
+    >
+      <div
+        v-for="area in areas"
+        :key="`area-${area.col}-${area.row}`"
+        :style="areaStyle(area.col, area.row)"
+        @click="seed(area.col, area.row, 255, 255, 255)"
+      />
+      <Cell
+        v-for="cell in cells"
+        :key="`cell-${cell.col}-${cell.row}`"
+        :uuid="cell.uuid"
+        :size="size"
+        :seed-col="cell.col"
+        :seed-row="cell.row"
+        :seed-r="cell.r"
+        :seed-g="cell.g"
+        :seed-b="cell.b"
+        :grid-cols="cols"
+        :grid-rows="rows"
+        :lifecycle="lifecycle"
+        @duplicate="duplicate"
+        @die="removeCell"
+      />
+    </div>
+    <button @click="reset">
+      Reset
+    </button>
   </div>
+
 </template>
 
 <script lang="ts">
@@ -85,10 +91,15 @@ export default class Grid extends Vue {
     };
   }
 
-  private mounted() {
+  private mounted(): void {
     setInterval(() => {
       this.lifecycle += 1;
     }, 1000);
+  }
+
+  private reset(): void {
+    this.cells = [];
+    this.lifecycle = 0;
   }
 
   private areaStyle(col: number, row: number) {
@@ -102,7 +113,7 @@ export default class Grid extends Vue {
     };
   }
 
-  private seed(col: number, row: number, r = 0, g = 0, b = 0) {
+  private seed(col: number, row: number, r = 0, g = 0, b = 0): void {
     this.cells.push({
       uuid: uuidv4(),
       col,
@@ -113,13 +124,8 @@ export default class Grid extends Vue {
     });
   }
 
-  private duplicate(data: {
-    uuid: string,
-    r: number,
-    g: number,
-    b: number,
-  }): void {
-    const parent = this.cells.find((cell) => cell.uuid === data.uuid);
+  private duplicate(uuid: string): void {
+    const parent = this.cells.find((cell) => cell.uuid === uuid);
     if (parent) {
       const nextAreas = this.findNextAreas(parent);
       nextAreas.forEach((area) => {
